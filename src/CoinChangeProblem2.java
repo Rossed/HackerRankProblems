@@ -20,56 +20,56 @@ public class CoinChangeProblem2 {
     static HashMap<Integer, Integer> checkMap = new HashMap<Integer, Integer>();
 
     public static int coin(int N, int[] C, int stage) {
-        System.out.println("_____________________________________________");
-        System.out.println("solution: "+solution);
-        System.out.println("checking: "+N);
-        int previousStage = stage;
         stage = ((stage-1)*C.length)+1;
 
         //If N has been already checked
         if (checkMap.get(N)!=null) {
-            System.out.println("IF");
-            //If there is a solution
-            int prevN = (solution.get(solution.size() - 1)+N);
             if (solutionMap.get(N)!=null) {
-                //ArrayList where new solutions will be stored to then be added to solutionMap
-                ArrayList<ArrayList<Integer>> newSolutionList = new ArrayList<ArrayList<Integer>>();
-                System.out.println("getting: "+(((solution.get(solution.size() - 1)+N))));
-                if (solutionMap.get(((solution.get(solution.size() - 1)+N)))!=null) {
-                    newSolutionList = solutionMap.get(((solution.get(solution.size() - 1) + N)));
-                }
-                for (int i=0; i<solutionMap.get(N).size(); i++) {
-                    ArrayList<Integer> newSolution = concatenateNumberToArrayList(solution.get(solution.size() - 1), solutionMap.get(N).get(i));
-                    boolean contained = false;
-                    if (solutionMap.get(prevN)!=null){
+                int prevN = N;
+                //FOR all items in solution (currentSet)
+                for (int i = 0; i < solution.size(); i++) {
+                    int tempN = prevN;
+                    prevN = prevN + (solution.get(solution.size() - 1 - i));
+                    ArrayList<Integer> concatenation1 = slice(solution, solution.size()-1-i,solution.size());
+                    //Add all current previous N solutions to allConcatenatedArrays
+                    ArrayList<ArrayList<Integer>> allConcatenatedArrays = new ArrayList<ArrayList<Integer>>();
+                    if (solutionMap.get(prevN)!=null) {
                         for (int j = 0; j < solutionMap.get(prevN).size(); j++) {
-                            System.out.println("comparing: " + newSolution + " with " + solutionMap.get(prevN).get(j));
-                            if (compareArrayLists(newSolution, solutionMap.get(prevN).get(j))) {
-                                contained = true;
+                            allConcatenatedArrays.add(solutionMap.get(prevN).get(j));
+                        }
+                    }
+                    //Concatenate current Ns solution (solutions that have already been found)
+                    // to previous Ns solution
+                    ArrayList<Integer> concatenatedArray = new ArrayList<Integer>();
+                    for (int j=0; j<solutionMap.get(N).size(); j++) {
+                        concatenatedArray = concatenateArrayLists(concatenation1
+                                , solutionMap.get(N).get(j));
+                        boolean contained = false;
+                        //IF there are already calculated solutions for previous N
+                        if (solutionMap.get(prevN)!=null) {
+                            //Check whether solution has already been added to previous N
+                            for (int k = 0; k < solutionMap.get(prevN).size(); k++) {
+                                if (compareArrayLists(concatenatedArray, solutionMap.get(prevN).get(k))) {
+                                    contained = true;
+                                }
                             }
                         }
+                        //If current solution is not contained add it to allConcatenadtedArrays, which contains
+                        // all solutions for previous N
                         if (!contained) {
-                            System.out.println("Adding: " + solution);
-                            newSolutionList.add(newSolution);
+                            allConcatenatedArrays.add(concatenatedArray);
                         }
-                    } else {
-                        newSolutionList.add(newSolution);
                     }
+                    //make previous N, all previous solutions plus new solutions
+                    solutionMap.put(prevN, allConcatenatedArrays);
                 }
-
-                solutionMap.put(((solution.get(solution.size() - 1) + N)), newSolutionList);
             }
         } else {
-            System.out.println("ELSE");
             //Iterate through all items in C
             outerloop:
             for (int i = 0; i < C.length; i++) {
-                System.out.println("N: "+N);
-                System.out.println("C[i]: "+C[i]);
-                System.out.println(solutionMap);
                 //Solution found
                 if (N == C[i]) {
-                    System.out.println("used");
                     /************* Record in SolutionMap ******************/
                     //Add current item to solution
                     solution.add(C[i]);
@@ -146,15 +146,20 @@ public class CoinChangeProblem2 {
             checkMap.put(N, 1);
         }
 
-        System.out.println(solutionMap);
+//        System.out.println(solutionMap.get(222).size());
 
         //If solution is greater than zero, return solution but remove the last item so the program can continue
         if(solution.size()>0){
             return solution.remove(solution.size() - 1);
-        } else {
+        } else if (solutionMap.get(N)!=null){
         //If solution is zero, i.e. program has finished checking all return the number
         // of solutions found (i.e. the size of solutionList)
+//            for (int i=0; i<solutionMap.get(N).size(); i++) {
+//                System.out.println(solutionMap.get(N).get(i));
+//            }
             return solutionMap.get(N).size();
+        } else {
+            return 0;
         }
     }
 
@@ -230,14 +235,20 @@ public class CoinChangeProblem2 {
 //        int N = 15;
 //        int C[] = {49, 22, 45, 6, 11, 20, 30, 10, 46, 8, 32, 48, 2, 41, 43, 5, 39, 16, 28, 44, 14, 4, 27, 36};
 
-        int N = 4;
-        int C[] = {1,2,3};
+//        int N = 4;
+//        int C[] = {1,2,3};
 
 //        int N=10;
 //        int C[] = {2,5,3,6};
 
-//        int N=20;
+//        int N = 20;
 //        int C[] = {1, 4, 7, 10};
+
+//        int N = 222;
+//        int C[] = {3, 25, 34, 38, 26, 42, 16, 10, 15, 50, 39, 44, 36, 29, 22, 43, 20, 27, 9, 30, 47, 13, 40, 33};
+
+        int N = 1;
+        int C[] = {5, 10, 6};
 
         int stage = 1;
 
