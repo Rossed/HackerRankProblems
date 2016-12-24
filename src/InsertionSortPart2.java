@@ -15,6 +15,7 @@ public class InsertionSortPart2 {
             while (j>(-1) && e < ar[j]) {
                 ar[j+1] = ar[j];
                 ar[j] = e;
+
                 j--;
             }
             printArray(ar);
